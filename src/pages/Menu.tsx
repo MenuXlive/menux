@@ -73,25 +73,25 @@ const Menu = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="bg-background flex items-center justify-center">
         <Sparkles className="w-8 h-8 text-primary animate-pulse" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-primary mb-2 flex items-center justify-center gap-3">
-            <Sparkles className="w-10 h-10" />
+    <div className="bg-background">
+      <div className="px-2 py-4">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold text-foreground mb-1 flex items-center justify-center gap-2">
+            <Sparkles className="w-6 h-6" />
             Premium Bar Menu
           </h1>
-          <p className="text-muted-foreground text-lg">Hinjewadi, Pune</p>
+          <p className="text-muted-foreground text-sm">Hinjewadi, Pune</p>
         </div>
 
         <Tabs defaultValue="alcohol" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="alcohol" className="gap-2">
               <Wine className="w-4 h-4" />
               Beverages
@@ -102,53 +102,53 @@ const Menu = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="alcohol" className="space-y-8">
+          <TabsContent value="alcohol" className="space-y-6">
             {Object.entries(alcoholByCategory).map(([category, items]) => (
               <div key={category}>
-                <h2 className="text-3xl font-bold text-primary mb-6 border-b border-border pb-2">
+                <h2 className="text-xl font-bold text-foreground mb-4 border-b border-border pb-2">
                   {category}
                 </h2>
-                <div className="grid gap-4">
+                <div className="grid gap-3">
                   {items.map((item: AlcoholItem) => (
-                    <Card key={item.id} className="border-border/50 bg-card hover:border-primary/50 transition-colors">
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start mb-4">
+                    <Card key={item.id} className="border-border/50 bg-card">
+                      <CardContent className="p-4">
+                        <div className="flex justify-between items-start mb-3">
                           <div>
-                            <h3 className="text-xl font-semibold text-foreground mb-1">{item.name}</h3>
+                            <h3 className="text-base font-semibold text-foreground mb-1">{item.name}</h3>
                             {item.brand && (
-                              <p className="text-muted-foreground text-sm">{item.brand}</p>
+                              <p className="text-muted-foreground text-xs">{item.brand}</p>
                             )}
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                           {item.price_30ml && (
-                            <div className="text-center p-3 bg-secondary rounded-lg">
+                            <div className="text-center p-2 bg-secondary rounded-lg">
                               <p className="text-xs text-muted-foreground mb-1">30ml</p>
-                              <p className="text-lg font-bold text-primary">₹{item.price_30ml}</p>
+                              <p className="text-base font-bold text-primary">₹{item.price_30ml}</p>
                             </div>
                           )}
                           {item.price_60ml && (
-                            <div className="text-center p-3 bg-secondary rounded-lg">
+                            <div className="text-center p-2 bg-secondary rounded-lg">
                               <p className="text-xs text-muted-foreground mb-1">60ml</p>
-                              <p className="text-lg font-bold text-primary">₹{item.price_60ml}</p>
+                              <p className="text-base font-bold text-primary">₹{item.price_60ml}</p>
                             </div>
                           )}
                           {item.price_90ml && (
-                            <div className="text-center p-3 bg-secondary rounded-lg">
+                            <div className="text-center p-2 bg-secondary rounded-lg">
                               <p className="text-xs text-muted-foreground mb-1">90ml</p>
-                              <p className="text-lg font-bold text-primary">₹{item.price_90ml}</p>
+                              <p className="text-base font-bold text-primary">₹{item.price_90ml}</p>
                             </div>
                           )}
                           {item.price_180ml && (
-                            <div className="text-center p-3 bg-secondary rounded-lg">
+                            <div className="text-center p-2 bg-secondary rounded-lg">
                               <p className="text-xs text-muted-foreground mb-1">180ml</p>
-                              <p className="text-lg font-bold text-primary">₹{item.price_180ml}</p>
+                              <p className="text-base font-bold text-primary">₹{item.price_180ml}</p>
                             </div>
                           )}
                           {item.price_bottle && (
-                            <div className="text-center p-3 bg-secondary rounded-lg">
+                            <div className="text-center p-2 bg-secondary rounded-lg">
                               <p className="text-xs text-muted-foreground mb-1">Bottle</p>
-                              <p className="text-lg font-bold text-primary">₹{item.price_bottle}</p>
+                              <p className="text-base font-bold text-primary">₹{item.price_bottle}</p>
                             </div>
                           )}
                         </div>
@@ -160,24 +160,24 @@ const Menu = () => {
             ))}
           </TabsContent>
 
-          <TabsContent value="food" className="space-y-8">
+          <TabsContent value="food" className="space-y-6">
             {Object.entries(foodByCategory).map(([category, items]) => (
               <div key={category}>
-                <h2 className="text-3xl font-bold text-primary mb-6 border-b border-border pb-2">
+                <h2 className="text-xl font-bold text-foreground mb-4 border-b border-border pb-2">
                   {category}
                 </h2>
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid gap-3">
                   {items.map((item: FoodItem) => (
-                    <Card key={item.id} className="border-border/50 bg-card hover:border-primary/50 transition-colors">
-                      <CardContent className="p-6">
+                    <Card key={item.id} className="border-border/50 bg-card">
+                      <CardContent className="p-4">
                         <div className="flex justify-between items-start mb-2">
                           <div className="flex-1">
-                            <h3 className="text-xl font-semibold text-foreground mb-1">{item.name}</h3>
+                            <h3 className="text-base font-semibold text-foreground mb-1">{item.name}</h3>
                             {item.description && (
-                              <p className="text-sm text-muted-foreground mb-2">{item.description}</p>
+                              <p className="text-xs text-muted-foreground mb-2">{item.description}</p>
                             )}
                           </div>
-                          <p className="text-2xl font-bold text-primary ml-4">₹{item.price}</p>
+                          <p className="text-lg font-bold text-primary ml-4">₹{item.price}</p>
                         </div>
                         {item.vegetarian && (
                           <Badge variant="secondary" className="text-xs">

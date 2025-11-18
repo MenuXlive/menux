@@ -20,6 +20,18 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [resetMode, setResetMode] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+
+  useEffect(() => {
+    const { data: subscription } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setResetMode(true);
+        toast.info("Please set a new password");
+      }
+    });
+    return () => subscription?.subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -45,13 +57,11 @@ const Auth = () => {
         toast.success("Logged in successfully");
         navigate("/admin");
       } else {
-        const redirectUrl = `${window.location.origin}/admin`;
+        const redirectUrl = `${window.location.origin}/auth`;
         const { error } = await supabase.auth.signUp({
           email: validated.email,
           password: validated.password,
-          options: {
-            emailRedirectTo: redirectUrl,
-          },
+          options: { emailRedirectTo: redirectUrl },
         });
         if (error) throw error;
         toast.success("Account created! You can now log in.");
@@ -68,6 +78,74 @@ const Auth = () => {
       setLoading(false);
     }
   };
+
+  const handleForgotPassword = async () => {
+    try {
+      if (!email) {
+        toast.error("Enter your email to receive the reset link");
+        return;
+      }
+      setLoading(true);
+      const redirectUrl = `${window.location.origin}/auth`;
+      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: redirectUrl });
+      if (error) throw error;
+      toast.success("Reset link sent to your email");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to send reset link");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSetNewPassword = async () => {
+    try {
+      if (!newPassword || newPassword.length < 6) {
+        toast.error("Password must be at least 6 characters");
+        return;
+      }
+      setLoading(true);
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      toast.success("Password updated. You can now log in.");
+      setResetMode(false);
+      setNewPassword("");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update password");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (resetMode) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md border-border/50">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Reset Password</CardTitle>
+            <CardDescription>Enter a new password to complete recovery</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-password">New Password</Label>
+                <Input id="new-password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+              </div>
+              <Button onClick={handleSetNewPassword} className="w-full" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  "Update Password"
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -114,16 +192,23 @@ const Auth = () => {
                     required
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Logging in...
-                    </>
-                  ) : (
-                    "Login"
-                  )}
-                </Button>
+                <div className="flex items-center justify-between">
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Logging in...
+                      </>
+                    ) : (
+                      "Login"
+                    )}
+                  </Button>
+                </div>
+                <div className="text-center">
+                  <button type="button" onClick={handleForgotPassword} className="text-sm text-primary hover:underline">
+                    Forgot password?
+                  </button>
+                </div>
               </form>
             </TabsContent>
             <TabsContent value="signup">

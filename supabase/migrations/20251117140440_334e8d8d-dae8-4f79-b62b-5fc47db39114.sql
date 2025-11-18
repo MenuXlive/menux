@@ -1,8 +1,13 @@
--- Create user roles enum
-CREATE TYPE public.app_role AS ENUM ('admin', 'user');
+-- Create user roles enum (idempotent)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'app_role') THEN
+    CREATE TYPE public.app_role AS ENUM ('admin', 'user');
+  END IF;
+END $$;
 
 -- Create user roles table
-CREATE TABLE public.user_roles (
+CREATE TABLE IF NOT EXISTS public.user_roles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   role app_role NOT NULL DEFAULT 'user',
@@ -29,7 +34,7 @@ AS $$
 $$;
 
 -- Create alcohol table with multiple price points
-CREATE TABLE public.alcohol (
+CREATE TABLE IF NOT EXISTS public.alcohol (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   category TEXT NOT NULL, -- e.g., Whisky, Vodka, Rum, Beer, Wine, etc.
@@ -48,7 +53,7 @@ CREATE TABLE public.alcohol (
 ALTER TABLE public.alcohol ENABLE ROW LEVEL SECURITY;
 
 -- Create food menu table
-CREATE TABLE public.food_menu (
+CREATE TABLE IF NOT EXISTS public.food_menu (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   category TEXT NOT NULL CHECK (category IN ('Starters', 'Snacks', 'Full Course')),
@@ -64,65 +69,76 @@ CREATE TABLE public.food_menu (
 ALTER TABLE public.food_menu ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for alcohol (public read, admin write)
-CREATE POLICY "Anyone can view alcohol menu"
-  ON public.alcohol
-  FOR SELECT
-  USING (true);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='alcohol' AND policyname='Anyone can view alcohol menu'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Anyone can view alcohol menu" ON public.alcohol FOR SELECT USING (true)';
+  END IF;
 
-CREATE POLICY "Admins can insert alcohol"
-  ON public.alcohol
-  FOR INSERT
-  TO authenticated
-  WITH CHECK (public.has_role(auth.uid(), 'admin'));
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='alcohol' AND policyname='Admins can insert alcohol'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Admins can insert alcohol" ON public.alcohol FOR INSERT TO authenticated WITH CHECK (public.has_role(auth.uid(), ''admin''))';
+  END IF;
 
-CREATE POLICY "Admins can update alcohol"
-  ON public.alcohol
-  FOR UPDATE
-  TO authenticated
-  USING (public.has_role(auth.uid(), 'admin'));
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='alcohol' AND policyname='Admins can update alcohol'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Admins can update alcohol" ON public.alcohol FOR UPDATE TO authenticated USING (public.has_role(auth.uid(), ''admin''))';
+  END IF;
 
-CREATE POLICY "Admins can delete alcohol"
-  ON public.alcohol
-  FOR DELETE
-  TO authenticated
-  USING (public.has_role(auth.uid(), 'admin'));
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='alcohol' AND policyname='Admins can delete alcohol'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Admins can delete alcohol" ON public.alcohol FOR DELETE TO authenticated USING (public.has_role(auth.uid(), ''admin''))';
+  END IF;
+END $$;
 
 -- RLS Policies for food_menu (public read, admin write)
-CREATE POLICY "Anyone can view food menu"
-  ON public.food_menu
-  FOR SELECT
-  USING (true);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='food_menu' AND policyname='Anyone can view food menu'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Anyone can view food menu" ON public.food_menu FOR SELECT USING (true)';
+  END IF;
 
-CREATE POLICY "Admins can insert food"
-  ON public.food_menu
-  FOR INSERT
-  TO authenticated
-  WITH CHECK (public.has_role(auth.uid(), 'admin'));
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='food_menu' AND policyname='Admins can insert food'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Admins can insert food" ON public.food_menu FOR INSERT TO authenticated WITH CHECK (public.has_role(auth.uid(), ''admin''))';
+  END IF;
 
-CREATE POLICY "Admins can update food"
-  ON public.food_menu
-  FOR UPDATE
-  TO authenticated
-  USING (public.has_role(auth.uid(), 'admin'));
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='food_menu' AND policyname='Admins can update food'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Admins can update food" ON public.food_menu FOR UPDATE TO authenticated USING (public.has_role(auth.uid(), ''admin''))';
+  END IF;
 
-CREATE POLICY "Admins can delete food"
-  ON public.food_menu
-  FOR DELETE
-  TO authenticated
-  USING (public.has_role(auth.uid(), 'admin'));
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='food_menu' AND policyname='Admins can delete food'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Admins can delete food" ON public.food_menu FOR DELETE TO authenticated USING (public.has_role(auth.uid(), ''admin''))';
+  END IF;
+END $$;
 
 -- RLS Policies for user_roles
-CREATE POLICY "Users can view their own roles"
-  ON public.user_roles
-  FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_roles' AND policyname='Users can view their own roles'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Users can view their own roles" ON public.user_roles FOR SELECT TO authenticated USING (auth.uid() = user_id)';
+  END IF;
 
-CREATE POLICY "Admins can manage all roles"
-  ON public.user_roles
-  FOR ALL
-  TO authenticated
-  USING (public.has_role(auth.uid(), 'admin'));
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_roles' AND policyname='Admins can manage all roles'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Admins can manage all roles" ON public.user_roles FOR ALL TO authenticated USING (public.has_role(auth.uid(), ''admin''))';
+  END IF;
+END $$;
 
 -- Create function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()
@@ -134,11 +150,13 @@ END;
 $$ LANGUAGE plpgsql SET search_path = public;
 
 -- Create triggers for automatic timestamp updates
+DROP TRIGGER IF EXISTS update_alcohol_updated_at ON public.alcohol;
 CREATE TRIGGER update_alcohol_updated_at
   BEFORE UPDATE ON public.alcohol
   FOR EACH ROW
   EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_food_menu_updated_at ON public.food_menu;
 CREATE TRIGGER update_food_menu_updated_at
   BEFORE UPDATE ON public.food_menu
   FOR EACH ROW
