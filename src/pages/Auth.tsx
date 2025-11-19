@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Wine, Loader2 } from "lucide-react";
+import { Wine, Loader2, Lock, Mail, Sparkles } from "lucide-react";
 import { z } from "zod";
 
 const authSchema = z.object({
@@ -118,19 +118,43 @@ const Auth = () => {
 
   if (resetMode) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md border-border/50">
-          <CardHeader className="text-center">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Animated background */}
+        <div className="absolute inset-0 animated-gradient opacity-10" />
+        <div className="absolute top-20 right-20 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl float" />
+        <div className="absolute bottom-20 left-20 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl float" style={{ animationDelay: '2s' }} />
+
+        <Card className="w-full max-w-md glass border-white/20 relative z-10 animate-slide-up">
+          <CardHeader className="text-center space-y-2">
+            <div className="flex justify-center mb-2">
+              <div className="w-14 h-14 rounded-2xl gradient-bg-purple flex items-center justify-center">
+                <Lock className="w-7 h-7 text-white" />
+              </div>
+            </div>
             <CardTitle className="text-2xl">Reset Password</CardTitle>
             <CardDescription>Enter a new password to complete recovery</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="new-password">New Password</Label>
-                <Input id="new-password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                <Label htmlFor="new-password" className="flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-purple-400" />
+                  New Password
+                </Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  autoComplete="new-password"
+                  className="glass border-white/20 focus:border-purple-500/50"
+                />
               </div>
-              <Button onClick={handleSetNewPassword} className="w-full" disabled={loading}>
+              <Button
+                onClick={handleSetNewPassword}
+                className="w-full gradient-bg-purple text-white border-0 btn-shine"
+                disabled={loading}
+              >
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -148,22 +172,36 @@ const Auth = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md border-border/50">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <Wine className="w-12 h-12 text-primary" />
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Animated background */}
+      <div className="absolute inset-0 animated-gradient opacity-10" />
+      <div className="absolute top-20 right-20 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl float" />
+      <div className="absolute bottom-20 left-20 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl float" style={{ animationDelay: '2s' }} />
+
+      <Card className="w-full max-w-md glass border-white/20 relative z-10 animate-slide-up">
+        <CardHeader className="text-center space-y-2">
+          <div className="flex justify-center mb-2">
+            <div className="w-14 h-14 rounded-2xl gradient-bg-purple flex items-center justify-center pulse-glow">
+              <Wine className="w-7 h-7 text-white" />
+            </div>
           </div>
-          <CardTitle className="text-3xl">Admin Access</CardTitle>
+          <CardTitle className="text-3xl">
+            <span className="gradient-text">Admin Access</span>
+          </CardTitle>
           <CardDescription>Manage your bar menu</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 glass border-white/10">
+              <TabsTrigger value="login" className="data-[state=active]:gradient-bg-purple data-[state=active]:text-white">
+                Login
+              </TabsTrigger>
+              <TabsTrigger value="signup" className="data-[state=active]:gradient-bg-cyan data-[state=active]:text-white">
+                Sign Up
+              </TabsTrigger>
             </TabsList>
-            <TabsContent value="login">
+
+            <TabsContent value="login" className="animate-fade-in">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -172,46 +210,63 @@ const Auth = () => {
                 className="space-y-4"
               >
                 <div className="space-y-2">
-                  <Label htmlFor="login-email">Email</Label>
+                  <Label htmlFor="login-email" className="flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-purple-400" />
+                    Email
+                  </Label>
                   <Input
                     id="login-email"
                     type="email"
                     placeholder="admin@bar.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
                     required
+                    className="glass border-white/20 focus:border-purple-500/50"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="login-password">Password</Label>
+                  <Label htmlFor="login-password" className="flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-purple-400" />
+                    Password
+                  </Label>
                   <Input
                     id="login-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="current-password"
                     required
+                    className="glass border-white/20 focus:border-purple-500/50"
                   />
                 </div>
-                <div className="flex items-center justify-between">
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Logging in...
-                      </>
-                    ) : (
-                      "Login"
-                    )}
-                  </Button>
-                </div>
+                <Button
+                  type="submit"
+                  className="w-full gradient-bg-purple text-white border-0 btn-shine"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Logging in...
+                    </>
+                  ) : (
+                    "Login"
+                  )}
+                </Button>
                 <div className="text-center">
-                  <button type="button" onClick={handleForgotPassword} className="text-sm text-primary hover:underline">
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
+                  >
                     Forgot password?
                   </button>
                 </div>
               </form>
             </TabsContent>
-            <TabsContent value="signup">
+
+            <TabsContent value="signup" className="animate-fade-in">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -220,27 +275,41 @@ const Auth = () => {
                 className="space-y-4"
               >
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-email" className="flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-cyan-400" />
+                    Email
+                  </Label>
                   <Input
                     id="signup-email"
                     type="email"
                     placeholder="admin@bar.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
                     required
+                    className="glass border-white/20 focus:border-cyan-500/50"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password" className="flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-cyan-400" />
+                    Password
+                  </Label>
                   <Input
                     id="signup-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="new-password"
                     required
+                    className="glass border-white/20 focus:border-cyan-500/50"
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button
+                  type="submit"
+                  className="w-full gradient-bg-cyan text-white border-0 btn-shine"
+                  disabled={loading}
+                >
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
